@@ -22,5 +22,6 @@ This mod is server-side only, it is useless on a client.
 
 To-do List:
 - [x] Mod base
+- [x] Custom discord channel topic with server info
 - [ ] Customize format in config
 - [ ] Toggle Discord ping from MC
