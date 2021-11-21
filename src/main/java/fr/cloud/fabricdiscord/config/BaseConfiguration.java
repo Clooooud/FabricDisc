@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import fr.cloud.fabricdiscord.FabricDiscord;
 import lombok.SneakyThrows;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.io.*;
 import java.lang.annotation.ElementType;
@@ -45,22 +46,20 @@ public class BaseConfiguration {
         }
     }
 
-    private void reset() throws FileNotFoundException {
+    private void reset() throws FileNotFoundException, IllegalAccessException {
         HashMap<String, String> configKeys = new HashMap<>();
-        getConfigFields().forEach(field -> {
-            try {
-                configKeys.put(field.getName(), (String) field.get(this));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        });
+
+        for (Field field : getConfigFields()) {
+            configKeys.put(field.getName(), (String) field.get(this));
+        }
+
         PrintWriter out = new PrintWriter(new FileOutputStream(file), true);
         String content = new GsonBuilder().setPrettyPrinting().create().toJson(configKeys);
         out.println(content);
         out.close();
     }
 
-    private boolean createFile() throws IOException {
+    private boolean createFile() throws IOException, IllegalAccessException {
         if (!file.exists()) {
             file.createNewFile();
             reset();
@@ -81,6 +80,7 @@ public class BaseConfiguration {
         return Stream.of(this.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(ConfigKey.class))
                 .peek(field -> field.setAccessible(true))
+                .peek(FieldUtils::removeFinalModifier)
                 .collect(Collectors.toList());
     }
 

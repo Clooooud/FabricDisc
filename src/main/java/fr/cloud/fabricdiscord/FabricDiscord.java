@@ -1,6 +1,9 @@
 package fr.cloud.fabricdiscord;
 
 import fr.cloud.fabricdiscord.callback.PlayerChatCallback;
+import fr.cloud.fabricdiscord.callback.PlayerJoinCallback;
+import fr.cloud.fabricdiscord.callback.PlayerLeaveCallback;
+import fr.cloud.fabricdiscord.discord.DiscordBot;
 import lombok.Getter;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -26,9 +29,9 @@ public class FabricDiscord implements DedicatedServerModInitializer {
 
         LOGGER.info("Registering events");
 
-        PlayerChatCallback.EVENT.register((sender, content) -> {
-            discordBot.getChannel().sendMessage(sender.getEntityName() + ": " + content).complete();
-        });
+        PlayerChatCallback.EVENT.register((sender, content) -> discordBot.sendMessage(sender.getEntityName() + ": " + content));
+        PlayerJoinCallback.EVENT.register(player -> discordBot.sendMessage(player.getEntityName() + " has joined the server."));
+        PlayerLeaveCallback.EVENT.register(player -> discordBot.sendMessage(player.getEntityName() + " has left the server."));
 
         LOGGER.info("Event registered");
     }
