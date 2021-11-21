@@ -7,6 +7,8 @@ import fr.cloud.fabricdiscord.discord.DiscordBot;
 import lombok.Getter;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +24,8 @@ public class FabricDiscord implements DedicatedServerModInitializer {
     public void onInitializeServer() {
         ServerLifecycleEvents.SERVER_STARTED.register(this::onServerStarted);
 
+        Version version = FabricLoaderImpl.INSTANCE.getModContainer("fabricdiscord").get().getMetadata().getVersion();
+        LOGGER.info("FabricDiscord v" + version.getFriendlyString() + " starting");
         LOGGER.info("Launching Discord Server...");
 
         discordBot = new DiscordBot(this);
@@ -34,6 +38,7 @@ public class FabricDiscord implements DedicatedServerModInitializer {
         PlayerLeaveCallback.EVENT.register(player -> discordBot.sendMessage(player.getEntityName() + " has left the server."));
 
         LOGGER.info("Event registered");
+        LOGGER.info("FabricDiscord v" + version.getFriendlyString() + " started");
     }
 
     private void onServerStarted(MinecraftServer minecraftServer) {
